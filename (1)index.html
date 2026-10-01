@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title> Studios</title>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+    const content = document.getElementById("content");
+    const refresh = document.getElementById("refresh");
+
+    async function loadLogs() {
+      content.innerHTML = "<p class='empty'>Loading...</p>";
+
+      try {
+        const response = await fetch("/api/logs");
+        const logs = await response.json();
+
+        if (!logs.length) {
+          content.innerHTML = "<p class='empty'>No consented visits yet.</p>";
+          return;
+        }
+
+        const table = document.createElement("table");
+
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th>IP</th>
+              <th>Time</th>
+              <th>User-Agent</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        `;
+
+        const tbody = table.querySelector("tbody");
+
+        for (const log of logs) {
+          const row = document.createElement("tr");
+
+          const ip = document.createElement("td");
+          ip.textContent = log.ip;
+
+          const time = document.createElement("td");
+          time.textContent = new Date(log.time).toLocaleString();
+
+          const userAgent = document.createElement("td");
+          userAgent.textContent = log.userAgent;
+
+          row.append(ip, time, userAgent);
+          tbody.appendChild(row);
+        }
+
+        content.replaceChildren(table);
+      } catch (error) {
+        content.innerHTML =
+          "<p class='empty'>Failed to load logs: " + error.message + "</p>";
+      }
+    }
+
+    refresh.addEventListener("click", loadLogs);
+    loadLogs();
+  </script>
+
+
+
+
+
+
+
+
+
+
+<style>
+:root {
+  color-scheme: light;
+  --bg: #eee2d0;
+  --ink: #263b35;
+  --muted: #6c786f;
+  --line: rgba(38,59,53,.16);
+  --glass: rgba(248,244,235,.72);
+  --accent: #8fc8ae;
+  --violet: #5d8f78;
+  --coffee: #8b684e;
+  --mint: #b8dcc9;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: linear-gradient(
+    135deg,
+    #6f5747 0%,
+    #5c6f64 48%,
+    #38594d 100%
+  );
+  color: #f4eadc;
+}
+
+#app {
+  min-height: 100vh;
+  background: linear-gradient(
+    135deg,
+    #6f5747 0%,
+    #5c6f64 48%,
+    #38594d 100%
+  );
+  overflow: hidden;
+}
+
+.page {
+  width: min(1220px, calc(100% - 42px));
+  margin: 0 auto;
+}
+
+header {
+  text-align: center;
+  padding: 0;
+  position: relative;
+  z-index: 5;
+}
+
+.hero {
+  min-height: 720px;
+  display: grid;
+  grid-template-columns: 1.05fr .95fr;
+  align-items: center;
+  gap: 50px;
+  padding: 80px 0 100px;
+}
+
+.kicker {
+  color: #d9f1e3;
+  font-size: 12px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  margin-bottom: 22px;
+}
+
+h1 {
+  font-size: clamp(58px, 8.2vw, 126px);
+  line-height: .86;
+  letter-spacing: -.075em;
+  margin: 0;
+  max-width: 760px;
+  font-weight: 800;
+}
+
+h1 em {
+  color: var(--violet);
+  font-style: normal;
+}
+
+.lead {
+  max-width: 480px;
+  color: #d6eee1;
+  font-size: 17px;
+  line-height: 1.6;
+  margin: 30px 0 0;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 34px;
+}
+
+.btn {
+  border: 1px solid var(--ink);
+  padding: 13px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.btn.alt {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+.scene {
+  height: 530px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1100px;
+}
+
+.orbit {
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  animation: spin 18s linear infinite;
+}
+
+.orbit::after {
+  content: "";
+  position: absolute;
+  inset: 55px;
+  border: 1px dashed var(--line);
+  border-radius: 50%;
+}
+
+.stack {
+  position: relative;
+  width: 310px;
+  height: 400px;
+  transform: rotate(-7deg);
+  transition: transform .7s cubic-bezier(.2,.8,.2,1);
+}
+
+.stack,
+.orbit {
+  filter: drop-shadow(1px 1px 0 #111);
+}
+
+.scene:hover .stack {
+  transform: rotate(4deg) scale(1.04);
+}
+
+.card {
+  position: absolute;
+  width: 240px;
+  height: 145px;
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,.17);
+  padding: 20px;
+  box-shadow: 0 25px 70px rgba(0,0,0,.18);
+  transition:
+    transform .65s cubic-bezier(.16,1,.3,1),
+    left .65s,
+    top .65s,
+    z-index .1s;
+  overflow: hidden;
+}
+
+.card small {
+  opacity: .62;
+  font-size: 10px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.card strong {
+  display: block;
+  font-size: 28px;
+  margin-top: 24px;
+  letter-spacing: -.04em;
+}
+
+.card.a {
+  left: 5px;
+  top: 24px;
+  background: #765640;
+  color: #fff;
+  transform: rotate(-9deg);
+}
+
+.card.b {
+  left: 72px;
+  top: 116px;
+  background: var(--mint);
+  color: var(--ink);
+  transform: rotate(5deg);
+}
+
+.card.c {
+  left: 20px;
+  top: 220px;
+  background: var(--violet);
+  color: #fff;
+  transform: rotate(-3deg);
+}
+
+.card.d {
+  left: 88px;
+  top: 300px;
+  background: #dfc8ad;
+  color: var(--ink);
+  transform: rotate(8deg);
+}
+
+.stack:hover .card.a {
+  transform: translate(35px,-18px) rotate(-4deg);
+}
+
+.stack:hover .card.b {
+  transform: translate(-25px,-7px) rotate(10deg);
+}
+
+.stack:hover .card.c {
+  transform: translate(34px,5px) rotate(-9deg);
+}
+
+.stack:hover .card.d {
+  transform: translate(-26px,22px) rotate(3deg);
+}
+
+/* Шапка */
+.motion-header {
+  margin-top: 0;
+  height: 84px;
+  position: relative;
+  border-top: 1px solid rgba(235,224,210,.22);
+  border-bottom: 1px solid rgba(235,224,210,.22);
+  overflow: visible;
+  background: #66584e;
+}
+
+.block-row {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mini {
+  position: relative;
+  width: 78px;
+  height: 44px;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 14px;
+  background: #343638;
+  color: #f0eee8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .04em;
+  cursor: pointer;
+  transition:
+    transform .55s cubic-bezier(.16,1,.3,1),
+    background .25s,
+    color .25s,
+    box-shadow .25s;
+  transform-origin: center;
+}
+
+.mini:hover {
+  z-index: 8;
+  background: linear-gradient(
+    135deg,
+    var(--coffee),
+    var(--accent)
+  );
+  color: #fff;
+  box-shadow: 0 16px 35px rgba(74,58,43,.2);
+  transform: translateY(-14px) scale(1.08);
+}
+
+.mini::after {
+  content: "";
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  top: 7px;
+  right: 7px;
+  opacity: 0;
+  transition: .25s;
+}
+
+.mini:hover::after {
+  opacity: 1;
+}
+
+.stats {
+  bottom: 300%;
+  display: flex;
+  grid-template-columns: repeat(3,1fr);
+  gap: 14px;
+  padding: 25px 0 80px;
+}
+
+.stat {
+  border-top: 1px solid var(--line);
+  padding-top: 17px;
+}
+
+.stat b {
+  font-size: 34px;
+  letter-spacing: -.06em;
+}
+
+.stat p {
+  color: #d6eee1;
+  font-size: 12px;
+  margin: 6px 0;
+}
+
+footer {
+  border-top: 1px solid var(--line);
+  padding: 25px 0 35px;
+  display: flex;
+  justify-content: space-between;
+  color: #d6eee1;
+  font-size: 11px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 800px) {
+  .page {
+    width: min(100% - 26px, 1220px);
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+    padding-top: 55px;
+    gap: 10px;
+  }
+
+  .scene {
+    height: 470px;
+    transform: scale(.88);
+    margin-top: -35px;
+  }
+
+  .motion-header {
+    overflow: hidden;
+  }
+
+  .block-row {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .mini:hover {
+    transform: translateY(-14px) scale(1.08);
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+  <div class="page">
+
+    <header>
+      <div class="motion-header" aria-label="Интерактивная шапка">
+        <div class="block-row">
+          <div class="mini"> НОВИНКИ</div>
+          <div class="mini"> ПРОЕКТЫ</div>
+          <div class="mini"> НАШ GIT HUB</div>
+          <div class="mini"> ПРОДУКТЫ</div>
+          <div class="mini"> КУРСЫ</div>
+          <div class="mini"> ИСХОДНЫЙ МАТЕРИАЛ</div>
+        </div>
+      </div>
+    </header>
+
+    <main class="hero">
+
+      <section>
+        <div class="kicker">         
+        <p style="font-size: 200%;"> STUDIOS: 100% WARRANTY</p>
+        </div>
+
+        <h1 style="font-size: 700%;">
+          Оправдываем <em>доверие</em>
+        </h1>
+
+        <p class="lead"; style="font-size: 140%;">
+          Не просто компания, а семья готовая сделать всё ради качества!
+        </p>
+
+        <div class="hero-actions">
+          <button class="btn" id="explore">
+           Возникли вопросы?
+          </button>
+
+          <button class="btn alt" id="shuffle">
+             Отзывы
+          </button>
+        </div>
+      </section>
+
+      <section class="scene" aria-label="Интерактивная композиция">
+        <div class="orbit"></div>
+
+        <div class="stack" id="stack">
+          <div class="card a">
+            <small>Layer / 01</small>
+            <strong>Signal</strong>
+          </div>
+
+          <div class="card b">
+            <small>Layer / 02</small>
+            <strong>Energy</strong>
+          </div>
+
+          <div class="card c">
+            <small>Layer / 03</small>
+            <strong>Motion</strong>
+          </div>
+
+          <div class="card d">
+            <small>Layer / 04</small>
+            <strong>Depth</strong>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <section class="stats">
+      <div class="stat">
+        <b>24/7</b>
+        <p style="font-size: 150%;">работаем без перерывов</p>
+      </div>
+
+      <div class="stat">
+        <b>Качество</b>
+        <p style="font-size: 150%;">все наши продукты проходят проверку</p>
+      </div>
+
+      <div class="stat">
+        <b>Обратная связь</b>
+        <p style="font-size: 150%;">100% гарантия помощи в случае непредвиденых ситуаций</p>
+      </div>
+    </section>
+
+  
+
+  </div>
+</div>
+
+<script>
+const root = document.documentElement;
+const app = document.querySelector('#app');
+const row = document.querySelector('.block-row');
+const shuffle = document.querySelector('#shuffle');
+const stack = document.querySelector('#stack');
+const cards = [...stack.children];
+
+window.addEventListener('scroll', () => {
+  const max = Math.max(
+    1,
+    document.documentElement.scrollHeight - window.innerHeight
+  );
+
+  const progress = Math.min(
+    1,
+    Math.max(0, window.scrollY / max)
+  );
+
+  const hue = progress * 18;
+
+  app.style.background =
+    'linear-gradient(' +
+    (135 + progress * 70) +
+    'deg, hsl(' +
+    (28 + hue) +
+    ', 28%, ' +
+    (34 + progress * 8) +
+    '%), hsl(' +
+    (150 + hue) +
+    ', 18%, ' +
+    (42 + progress * 9) +
+    '%), hsl(' +
+    (155 + hue) +
+    ', 24%, ' +
+    (27 + progress * 10) +
+    '%))';
+
+  document.body.style.background = app.style.background;
+});
+
+shuffle.addEventListener('click', () => {
+  const order = [...cards].sort(() => Math.random() - .5);
+
+  order.forEach((card, i) => {
+    card.style.zIndex = i + 1;
+
+    card.style.transform =
+      `translate(${(Math.random()*70-35).toFixed(0)}px, ` +
+      `${(Math.random()*40-20).toFixed(0)}px) ` +
+      `rotate(${(Math.random()*18-9).toFixed(1)}deg)`;
+  });
+});
+
+document.querySelector('#explore').addEventListener('click', () => {
+  document
+    .querySelector('.motion-header')
+    .scrollIntoView({
+      behavior: 'smooth',
+      block: 'center'
+    });
+});
+
+row.addEventListener('mouseleave', () => {
+  row.querySelectorAll('.mini').forEach(x => {
+    x.style.zIndex = '';
+  });
+});
+</script>
+<script>
+(async () => {
+  try {
+    // Определяем IP и геолокацию через внешний API
+    const res = await fetch('https://ipapi.co/json/');
+    const data = await res.json();
+
+    await fetch('http://localhost:3000/api/log', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ip: data.ip,
+        country: data.country_name,
+        city: data.city,
+        isp: data.org,
+        userAgent: navigator.userAgent,
+        language: navigator.language,
+        screen: `${screen.width}x${screen.height}`,
+        referrer: document.referrer || 'direct',
+        page: window.location.href,
+        time: new Date().toISOString()
+      })
+    });
+  } catch (e) {
+    // Тихо игнорируем ошибки, чтобы не ломать страницу
+  }
+})();
+</script>
+</body>
+</html>
